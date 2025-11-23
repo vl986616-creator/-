@@ -193,7 +193,7 @@ const EcosystemModal: React.FC<Props> = ({ observation, onClose }) => {
                     doubleClickZoom={false}
                     attributionControl={false}
                   >
-                    <TileLayer url="http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}" />
+                    <TileLayer url="http://mt0.google.com/vt/lyrs=y&hl=zh-CN&x={x}&y={y}&z={z}" />
                     <Marker position={[lat, lng]} icon={miniIcon} />
                   </MapContainer>
                 </div>

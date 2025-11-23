@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, CircleMarker, Popup, useMap, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import { ChevronDown, Sliders, Map as MapIcon, ArrowRight, Layers, Maximize2 } from 'lucide-react';
 import { TURTLE_SPECIES, GOOGLE_TERRAIN_URL, GOOGLE_HYBRID_URL, MAP_ATTRIBUTION } from './constants';
@@ -8,29 +8,21 @@ import { searchTaxonId, fetchObservations } from './services/api';
 import EcosystemModal from './components/EcosystemModal';
 
 // --- Assets ---
-// Manually defining marker icons to avoid build system issues
-const defaultIcon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
+// Active Flag Icon
 const activeFlagHtml = `
-  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-lg">
-    <path d="M4 15C4 15 5 16 8 16C11 16 13 14 16 14C19 14 20 15 20 15V3C20 3 19 4 16 4C13 4 11 6 8 6C5 6 4 5 4 5V15Z" fill="#ef4444" stroke="#7f1d1d" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M4 22V5" stroke="#7f1d1d" stroke-width="2" stroke-linecap="round"/>
-  </svg>
+  <div class="flag-inner">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-lg">
+      <path d="M4 15C4 15 5 16 8 16C11 16 13 14 16 14C19 14 20 15 20 15V3C20 3 19 4 16 4C13 4 11 6 8 6C5 6 4 5 4 5V15Z" fill="#ef4444" stroke="#7f1d1d" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M4 22V5" stroke="#7f1d1d" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
 `;
 
 const activeIcon = new L.DivIcon({
   html: activeFlagHtml,
-  className: 'flag-icon bg-transparent',
+  className: 'bg-transparent', // Removed 'flag-icon' to avoid CSS transform conflict
   iconSize: [40, 40],
-  iconAnchor: [4, 38], // Align bottom of pole
+  iconAnchor: [7, 37], // Align bottom of pole (approx 4px * 1.66 and 22px * 1.66)
   popupAnchor: [0, -30]
 });
 
@@ -193,13 +185,42 @@ const App: React.FC = () => {
           {/* Markers */}
           {filteredObservations.map(obs => {
             const isSelected = selectedObs?.id === obs.id;
+            const [lng, lat] = obs.geojson.coordinates;
+
+            if (isSelected) {
+              return (
+                <Marker
+                  key={obs.id}
+                  position={[lat, lng]}
+                  icon={activeIcon}
+                  eventHandlers={{
+                    click: () => setSelectedObs(obs),
+                  }}
+                  zIndexOffset={100}
+                />
+              );
+            }
+
             return (
-              <Marker
+              <CircleMarker
                 key={obs.id}
-                position={[obs.geojson.coordinates[1], obs.geojson.coordinates[0]]}
-                icon={isSelected ? activeIcon : defaultIcon}
+                center={[lat, lng]}
+                radius={7}
+                pathOptions={{
+                  fillColor: '#10b981', // emerald-500
+                  fillOpacity: 0.6,
+                  color: '#ffffff',
+                  weight: 2,
+                  opacity: 0.9,
+                }}
                 eventHandlers={{
                   click: () => setSelectedObs(obs),
+                  mouseover: (e) => {
+                    e.target.setStyle({ fillOpacity: 0.9, radius: 9, weight: 3 });
+                  },
+                  mouseout: (e) => {
+                    e.target.setStyle({ fillOpacity: 0.6, radius: 7, weight: 2 });
+                  }
                 }}
               />
             );

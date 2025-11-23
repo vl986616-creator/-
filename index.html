@@ -41,14 +41,17 @@
         transform-origin: center center;
         height: 100%;
       }
-      /* Flag Icon Animation */
-      .flag-icon {
-        transform-origin: bottom left;
+      /* Flag Icon Animation - Applied to inner wrapper to avoid conflict with Leaflet transform */
+      .flag-inner {
+        transform-origin: 7px 37px; /* Pivot around the bottom of the pole */
         animation: wave 2s infinite ease-in-out;
+        display: block;
+        width: 40px;
+        height: 40px;
       }
       @keyframes wave {
         0%, 100% { transform: rotate(0deg); }
-        50% { transform: rotate(5deg); }
+        50% { transform: rotate(10deg); }
       }
     </style>
   <script type="importmap">

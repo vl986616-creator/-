@@ -86,6 +86,6 @@ export const CHINA_CITIES = [
   { name: '海口', lat: 20.0 },
 ];
 
-export const GOOGLE_TERRAIN_URL = 'http://mt0.google.com/vt/lyrs=p&hl=en&x={x}&y={y}&z={z}';
-export const GOOGLE_HYBRID_URL = 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}';
+export const GOOGLE_TERRAIN_URL = 'http://mt0.google.com/vt/lyrs=p&hl=zh-CN&x={x}&y={y}&z={z}';
+export const GOOGLE_HYBRID_URL = 'http://mt0.google.com/vt/lyrs=y&hl=zh-CN&x={x}&y={y}&z={z}';
 export const MAP_ATTRIBUTION = '&copy; Google Maps';
