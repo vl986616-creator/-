@@ -83,14 +83,20 @@ const App: React.FC = () => {
 
       const taxonId = await searchTaxonId(selectedSpecies.name);
       if (taxonId) {
-        // Fetch 3 pages in parallel for speed
-        const [p1, p2, p3] = await Promise.all([
-           fetchObservations(taxonId, 1),
-           fetchObservations(taxonId, 2),
-           fetchObservations(taxonId, 3)
-        ]);
-        const allObs = [...p1, ...p2, ...p3];
-        setObservations(allObs);
+        // Fetch 10 pages in parallel to increase data density (approx 2000 records max)
+        const totalPages = 10;
+        const promises = [];
+        for (let i = 1; i <= totalPages; i++) {
+          promises.push(fetchObservations(taxonId, i));
+        }
+        
+        const results = await Promise.all(promises);
+        const allObs = results.flat();
+        
+        // Deduplicate by ID to be safe
+        const uniqueMap = new Map();
+        allObs.forEach(obs => uniqueMap.set(obs.id, obs));
+        setObservations(Array.from(uniqueMap.values()));
       }
       setLoading(false);
     };
@@ -302,7 +308,7 @@ const App: React.FC = () => {
       {loading && (
         <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[2000] bg-white text-slate-700 px-4 py-2 rounded-full shadow-lg flex items-center gap-3 text-sm font-medium">
           <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-          正在获取生物多样性数据...
+          正在获取更多生物数据...
         </div>
       )}
 
