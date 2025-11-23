@@ -1,0 +1,5 @@
+{
+  "name": "箱龟分布地图",
+  "description": "北美箱龟（Terrapene）原生环境交互式可视化工具，结合气候与生物多样性数据绘制原生栖息地地图。",
+  "requestFramePermissions": []
+}
